@@ -26,60 +26,25 @@ export const sponsorName = 'Alice';
 export const sponsorMnemonic = 'bottom drive obey lake curtain smoke basket hold race lonely fit walk';
 
 export const CONTRACT_DATA: ContractSails = {
-  programId: '0x0f986f5a85b7c1070a760661e55bce0bf70cbc0e0713f82d01c0d878914085d7',
+  programId: '0xf50eb102b716eee43f3292b4bb7e88d449514224dba10a42ad85315036403a47',
   idl: `
-    type KeyringData = struct {
-      address: str,
-      encoded: str,
-    };
+    type PingEnum = enum {
+  Ping,
+  Pong,
+};
 
-    type KeyringEvent = enum {
-      KeyringAccountSet,
-      Error: KeyringError,
-    };
+constructor {
+  New : ();
+};
 
-    type KeyringError = enum {
-      KeyringAddressAlreadyEsists,
-      UserAddressAlreadyExists,
-      UserCodedNameAlreadyExists,
-      UserDoesNotHasKeyringAccount,
-      KeyringAccountAlreadyExists,
-      SessionHasInvalidCredentials,
-      UserAndKeyringAddressAreTheSame,
-    };
+service Ping {
+  Ping : () -> PingEnum;
+  Pong : () -> PingEnum;
+};
 
-    type KeyringQueryEvent = enum {
-      LastWhoCall: actor_id,
-      SignlessAccountAddress: opt actor_id,
-      SignlessAccountData: opt KeyringData,
-    };
-
-    type PingEvent = enum {
-      Ping,
-      Pong,
-      KeyringError: KeyringError,
-    };
-
-    constructor {
-      New : ();
-    };
-
-    service KeyringService {
-      BindKeyringDataToUserAddress : (user_address: actor_id, keyring_data: KeyringData) -> KeyringEvent;
-      BindKeyringDataToUserCodedName : (user_coded_name: str, keyring_data: KeyringData) -> KeyringEvent;
-      query KeyringAccountData : (keyring_address: actor_id) -> KeyringQueryEvent;
-      query KeyringAddressFromUserAddress : (user_address: actor_id) -> KeyringQueryEvent;
-      query KeyringAddressFromUserCodedName : (user_coded_name: str) -> KeyringQueryEvent;
-    };
-
-    service Ping {
-      Ping : () -> PingEvent;
-      PingNoWallet : (user_coded_name: str) -> PingEvent;
-      PingSignless : (user_address: actor_id) -> PingEvent;
-      Pong : () -> PingEvent;
-      PongNoWallet : (user_coded_name: str) -> PingEvent;
-      PongSignless : (user_address: actor_id) -> PingEvent;
-      query LastCaller : () -> actor_id;
-    };
+service Query {
+  query AllCalls : () -> vec struct { actor_id, PingEnum };
+  query LastWhoCall : () -> struct { actor_id, PingEnum };
+};
   `
 };
