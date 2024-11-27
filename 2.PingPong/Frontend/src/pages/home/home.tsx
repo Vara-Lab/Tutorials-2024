@@ -1,5 +1,15 @@
 import { useEffect, useState } from "react";
-import { Button, Box, Text, Flex, Spinner, useToast } from "@chakra-ui/react";
+import {
+  Button,
+  Box,
+  Text,
+  Flex,
+  Spinner,
+  useToast,
+  IconButton,
+  Tooltip,
+} from "@chakra-ui/react";
+import { FaRegClipboard } from "react-icons/fa"; // Importar el ícono de React Icons
 import { useAccount, useAlert } from "@gear-js/react-hooks";
 import { useSailsCalls } from "@/app/hooks";
 import { web3FromSource } from "@polkadot/extension-dapp";
@@ -10,6 +20,7 @@ function Home() {
   const alert = useAlert();
   const toast = useToast();
   const [contractState, setContractState] = useState("");
+  const [blockHash, setBlockHash] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   // Función para consultar el estado del contrato
@@ -70,14 +81,16 @@ function Home() {
                 duration: 3000,
                 isClosable: true,
               }),
-            onBlock: (blockHash) =>
+            onBlock: (blockHash) => {
               toast({
                 title: "Transaction included",
                 description: `Message is included in block: ${blockHash}`,
                 status: "info",
                 duration: 3000,
                 isClosable: true,
-              }),
+              });
+              setBlockHash(blockHash); // Actualiza el blockHash
+            },
             onError: () =>
               toast({
                 title: "Transaction failed",
@@ -104,6 +117,20 @@ function Home() {
     }
   };
 
+  // Función para copiar el blockHash al portapapeles
+  const copyToClipboard = () => {
+    if (blockHash) {
+      navigator.clipboard.writeText(blockHash);
+      toast({
+        title: "Copied!",
+        description: "Block hash has been copied to clipboard.",
+        status: "success",
+        duration: 2000,
+        isClosable: true,
+      });
+    }
+  };
+
   // Consulta inicial del estado
   useEffect(() => {
     fetchContractState();
@@ -119,7 +146,7 @@ function Home() {
       minH="100vh"
       justify="center"
     >
-      {/* Contenedor del estado */}
+      {/* Contenedor del estado y block hash */}
       <Box
         w="100%"
         maxW="400px"
@@ -142,6 +169,31 @@ function Home() {
             {contractState || "No data available"}
           </Text>
         )}
+        <Flex align="center" justify="center" mt="4">
+          <Text
+            fontSize="md"
+            bgGradient="linear(to-r, #FF416C, #FF4B2B)"
+            bgClip="text"
+            fontWeight="bold"
+            whiteSpace="nowrap"
+            overflow="hidden"
+            textOverflow="ellipsis"
+            title={blockHash || "No block hash yet"}
+            mr="2"
+          >
+            {blockHash || "No block hash yet"}
+          </Text>
+          {blockHash && (
+            <Tooltip label="Copy to clipboard" hasArrow>
+              <IconButton
+                aria-label="Copy block hash"
+                icon={<FaRegClipboard />} // Ícono de React Icons
+                size="sm"
+                onClick={copyToClipboard}
+              />
+            </Tooltip>
+          )}
+        </Flex>
       </Box>
 
       {/* Botones Ping y Pong con gradientes */}
