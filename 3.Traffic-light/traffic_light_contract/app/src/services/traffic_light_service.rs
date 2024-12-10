@@ -108,7 +108,6 @@ impl TrafficLightService {
 #[derive(Encode, Decode, TypeInfo)]
 #[codec(crate = sails_rs::scale_codec)]
 #[scale_info(crate = sails_rs::scale_info)]
-
 pub enum TrafficLightEvent {
     Green,
     Yellow,
